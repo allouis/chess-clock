@@ -1,10 +1,11 @@
 <!doctype html>
-<html>
+<html manifest="main.appcache">
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <link href="css/main.css" rel="stylesheet" type="text/css"/>
         <script src="js/main.js"></script>
     </head>
-    <body>
+    <body onload="new App()">
         <div class="player" id="player-one">
             <h2 class="time">
                 10:00
@@ -15,18 +16,15 @@
                 10:00
             </h2>
         </div>
-        <div id="player-one-start" class="start-button"> Start! </div>
-        <div id="player-two-start" class="start-button"> Start! </div>
         <div id="options">
-            <label> Player One Name </label>
-            <input type="text" class="player-one-name">
-            <label> Player Two Name </label>
-            <input type="text" class="player-two-name">
-            <label> Game Time </label>
-            <input type="number" class="time-limit">
-            <label> Added Time Per Move </label>
-            <input type="number" class="time-increment">
+            <h1> Fabiens Chess Clock! </h1>
+            <input placeholder="Player One Name" type="text" class="player-one-name">
+            <input placeholder="Player Two Name" type="text" class="player-two-name">
+            <input placeholder="Clock Time (mins)" type="number" class="time-limit">
+            <input placeholder="Time Per Move (secs)"type="number" class="time-increment">
             <button id="save"> Save </button>
         </div>
+        <div id="player-one-start" class="start-button"> Start! </div>
+        <div id="player-two-start" class="start-button"> Start! </div>
     </body>
 </html>
