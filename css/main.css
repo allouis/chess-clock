@@ -15,7 +15,24 @@ body {
     margin:0;
 }
 
+#player-one-start,
 #player-one {
    transform: rotate(180deg); 
    -webkit-transform: rotate(180deg); 
+}
+
+.start-button {
+    position:absolute;
+    width:100%;
+    font-weight:100;
+    text-align:center;
+    font-size:50px;
+    margin-left:5px;
+    display:none;
+}
+#player-one-start {
+    top:30%;
+}
+#player-two-start {
+    bottom:30%;
 }
