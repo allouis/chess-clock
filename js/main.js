@@ -7,36 +7,90 @@ function _extend(){
     }
     return obj;
 }
+document.onload = start()
 function start(){
-    var userHeight = window.innerHeight / 2;
-    var timePadding = (userHeight - 35) / 2;
-    console.log(userHeight);
-    console.log(timePadding);
-    var options = {
-        height: userHeight,
-        padding: timePadding,
-        timeLeft: 600000,
-        timeIncrement: 5000
-    };
-    window.Players = {
-        one:new Player(_extend({name:"user-one"}, options)),
-        two:new Player(_extend({name:"user-two"}, options))
-    };
-    document.addEventListener("mousedown", function(){
-        console.log("mousedown");
-        Players.one.toggle();
-        Players.two.toggle();
-    });
+    window.app = new App()
 }
 
+function App(){
+    this.optionsEl = document.getElementById("options");
+    this.showOptions();
+    var userHeight = window.innerHeight / 2;
+    var timePadding = (userHeight - 35) / 2;
+    this.options = {
+        options: {
+            height: userHeight,
+            padding: timePadding,
+        }
+    };
+}
+
+App.prototype = {
+    
+    showOptions: function(){
+        this.optionsEl.style.display = "block";
+        var saveBtn = this.optionsEl.querySelector("#save");    
+        saveBtn.addEventListener("click", function(){
+            this.updateOptions();
+            this.optionsEl.style.display = "none";
+            this.newGame();
+        }.bind(this));
+    },
+
+    updateOptions: function(){
+        this.options.playerOneName = this.optionsEl.querySelector(".player-one-name").value;
+        this.options.playerTwoName = this.optionsEl.querySelector(".player-two-name").value;
+        this.options.options.timeLeft = parseInt(this.optionsEl.querySelector(".time-limit").value) * 60000
+        this.options.options.timeIncrement = parseInt(this.optionsEl.querySelector(".time-increment").value) * 1000 || 0;
+    },
+
+    newGame: function(){
+        window.game = new Game(this.options);
+    }
+
+};
+
+function Game(opts){
+    this.options = opts.options;
+    this.players = [];
+    this.players[0] = new Player(_extend({id:"player-one"}, this.options, {name:opts.playerOneName, game: this}));
+    this.players[1] = new Player(_extend({id:"player-two"}, this.options, {name:opts.playerTwoName, game: this}));
+    this.startButtons = [];
+    this.startButtons[0] = document.getElementById("player-one-start");
+    this.startButtons[1] = document.getElementById("player-two-start");
+    this.showStartButtons();
+}
+
+Game.prototype = {
+    
+    showStartButtons: function(){
+        this.startButtons[0].addEventListener("click", this.start.bind(this));
+        this.startButtons[1].addEventListener("click", this.start.bind(this));
+        this.startButtons[0].style.display = this.startButtons[1].style.display = "block";
+    },
+
+    start: function(event){
+        event.preventDefault();
+        var i = event.srcElement.nextSibling.nextSibling ? 0 : 1;
+        this.players[i].start();
+        document.addEventListener("mousedown", function(){
+            this.players[0].toggle();
+            this.players[1].toggle();
+        }.bind(this));
+        this.startButtons[0].style.display = this.startButtons[1].style.display = "none";
+    }
+};
+
 function Player(opts){
-    this.el = document.getElementById(opts.name);
+    this.el = document.getElementById(opts.id);
+    this.name = opts.name;
     this.timeEl = this.el.querySelector(".time");
     this.el.style.height = opts.height + "px";
     this.timeEl.style.padding = opts.padding + "px 0px";
     this.timeLeft = opts.timeLeft;
     this.timeIncrement = opts.timeIncrement;
     this.active = false;
+    this.render();
 }
 
 Player.prototype = {
@@ -45,6 +99,7 @@ Player.prototype = {
         if(!this.active) return;
         setTimeout(this.update.bind(this), 1000);
         this.timeLeft -= 1000;
+        if(this.timeLeft < 0) return this.game.lost(this);
         this.render();
     },
 
@@ -70,8 +125,8 @@ Player.prototype = {
 
     parseTime: function(milliseconds){
         var seconds = Math.floor(milliseconds / 1000);
-        var mins = Math.floor(seconds/60); 
-        var finalSeconds = seconds - (mins*60);
+        var mins = Math.max(0, Math.floor(seconds/60)); 
+        var finalSeconds = Math.max(0, seconds - (mins*60));
 
         return mins + ":" + (finalSeconds < 10 ? "0"+finalSeconds : finalSeconds);
     }
