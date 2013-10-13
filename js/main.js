@@ -7,10 +7,6 @@ function _extend(){
     }
     return obj;
 }
-document.onload = start()
-function start(){
-    window.app = new App()
-}
 
 function App(){
     this.optionsEl = document.getElementById("options");
@@ -45,7 +41,12 @@ App.prototype = {
     },
 
     newGame: function(){
-        window.game = new Game(this.options);
+        this.game = new Game(_extend({app:this},this.options));
+    },
+    
+    restart: function(){
+        delete this.game;
+        this.showOptions();
     }
 
 };
@@ -59,6 +60,7 @@ function Game(opts){
     this.startButtons[0] = document.getElementById("player-one-start");
     this.startButtons[1] = document.getElementById("player-two-start");
     this.showStartButtons();
+    this.app = opts.app;
 }
 
 Game.prototype = {
@@ -71,18 +73,31 @@ Game.prototype = {
 
     start: function(event){
         event.preventDefault();
-        var i = event.srcElement.nextSibling.nextSibling ? 0 : 1;
+        console.dir(event)
+        console.log(event.srcElement.nextSibling.nextSibling);
+        var i = !!event.srcElement.nextSibling.nextSibling ? 0 : 1;
         this.players[i].start();
-        document.addEventListener("mousedown", function(){
+        document.addEventListener("touchstart", function(){
             this.players[0].toggle();
             this.players[1].toggle();
         }.bind(this));
         this.startButtons[0].style.display = this.startButtons[1].style.display = "none";
+    },
+
+    lost: function(loser){
+        
+        this.players[0].stop();
+        this.players[1].stop(); 
+        var i = this.players.indexOf(loser); 
+        var name = this.players[i^1].name;
+        alert(name + " won the game!");
+        this.app.restart();
     }
 };
 
 function Player(opts){
     this.el = document.getElementById(opts.id);
+    this.game = opts.game;
     this.name = opts.name;
     this.timeEl = this.el.querySelector(".time");
     this.el.style.height = opts.height + "px";
