@@ -36,3 +36,22 @@ body {
 #player-two-start {
     bottom:30%;
 }
+#options {
+    width:90%;
+    padding:5%;
+    top:0;
+    height:100%;
+    position:absolute;
+    background-color:#fff;
+}
+h1 {
+    font-weight:100;
+}
+input {
+    width:98%;
+    font-size:20px;
+}
+#save {
+    width:100%;
+    font-size:20px;
+}
