@@ -105,6 +105,7 @@ function Player(opts){
     this.timeLeft = opts.timeLeft;
     this.timeIncrement = opts.timeIncrement;
     this.active = false;
+    this.timeouts = [];
     this.render();
 }
 
@@ -112,7 +113,7 @@ Player.prototype = {
 
     update: function(){
         if(!this.active) return;
-        setTimeout(this.update.bind(this), 1000);
+        this.timeouts.push(setTimeout(this.update.bind(this), 1000));
         this.timeLeft -= 1000;
         if(this.timeLeft < 0) return this.game.lost(this);
         this.render();
@@ -125,6 +126,10 @@ Player.prototype = {
 
     stop: function(){
         this.active = false;
+        for(var i = 0, l = this.timeouts.length; i < l; i++){
+            clearTimeout(this.timeouts[i]);
+        }
+        this.timeouts.length = 0;
         this.timeLeft += this.timeIncrement;
         this.render();
     },
