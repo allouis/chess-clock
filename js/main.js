@@ -141,6 +141,7 @@ Player.prototype = {
 
     render: function(){
         this.timeEl.innerHTML = this.parseTime(this.timeLeft);
+        this.timeEl.style.color = this.active ? "#60d350" : "#d35060";
     },
 
     parseTime: function(milliseconds){
